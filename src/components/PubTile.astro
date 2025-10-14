@@ -33,11 +33,42 @@ const firstEtAl = firstAuthorsEtAl(entry.data.authors ?? [], entry.data.first_au
       />
     </figure>
 
-    <div class="mt-2 font-medium line-clamp-2">
+    <div class="mt-2 font-medium">
       {
         suppressTitleTransition
-          ? entry.data.title
-          : <span transition:name={`title-${slug}`}>{entry.data.title}</span>
+          ? (
+            /* Publications page tiles (no transition) — clamp here too */
+            <span
+              class="block"
+              style="
+                display:-webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                line-height: 1.25;
+                max-height: 2.5em;
+              "
+            >
+              {entry.data.title}
+            </span>
+          )
+          : (
+            /* Home tiles / table → detail — clamp on the named element */
+            <span
+              transition:name={`title-${slug}`}
+              class="block"
+              style="
+                display:-webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                line-height: 1.25;
+                max-height: 2.5em;
+              "
+            >
+              {entry.data.title}
+            </span>
+          )
       }
     </div>
 

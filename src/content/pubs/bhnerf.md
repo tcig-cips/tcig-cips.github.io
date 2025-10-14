@@ -4,7 +4,7 @@ authors: ["Aviad Levis", "Pratul P. Srinivasan", "Andrew A. Chael", "Ren Ng", "K
 first_authors: ["Aviad Levis"]
 venue: CVPR
 year: 2022
-month: March                 # optional, for sorting
+month: Mar                 # optional, for sorting
 thumbnail: /images/pubs/bhnerf.gif   # or teaser: for the larger detail image/gif
 teaser: /images/pubs/bhnerf.gif       # optional preferred media for detail page
 youtube: eFPmShxhtg0        # OR: video: https://www.youtube.com/watch?v=dQw4w9WgXcQ

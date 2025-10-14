@@ -12,20 +12,31 @@ const { title = 'TCIG/CIPS', noTopPad = false } = Astro.props;
     <title>{title}</title>
     <!-- SPA routing + view transitions -->
     <ClientRouter/>  <!-- rely on named transitions only -->
+    <style>
+      /* Critical clamp to prevent title flash (2 lines) */
+      .vt-clamp-2 {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        line-height: 1.25;
+        max-height: 2.5em; /* 2 × line-height */
+      }
+    </style>
   </head>
   <body class="min-h-screen bg-white text-gray-900">
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b" transition:persist>
       <nav class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
-          <img src="/cips_logo.svg" alt="" class="h-11 w-11" transition:name="logo" />
+          <img src="/cips_logo.svg" alt="" class="h-12 w-12" transition:name="logo" />
           <span class="font-semibold" transition:name="brand">TCIG/CIPS</span>
         </a>
         <ul class="flex gap-6 text-sm">
-          <!-- <li><a class="hover:underline" href="/">Home</a></li> -->
-          <li><a class="hover:underline" href="https://www.compimaging.dgp.toronto.edu/home/">TCIG</a></li>
+          <li><a class="hover:underline" href="/">Home</a></li>
           <li><a class="hover:underline" href="/publications/">Research Areas</a></li>
           <li><a class="hover:underline" href="/publications/">Publications</a></li>
           <li><a class="hover:underline" href="/people/">People</a></li>
+          <li><a class="hover:underline" href="https://www.compimaging.dgp.toronto.edu/home/">TCIG</a></li>
           
         </ul>
       </nav>

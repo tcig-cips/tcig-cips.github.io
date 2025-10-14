@@ -92,8 +92,12 @@ const recentTiles = pubs.sort(byDateDesc).slice(0, TILE_COUNT);
 		{peopleAll.length > people.length && (
 		<span class="text-sm text-gray-600">+{peopleAll.length - people.length}</span>
 		)}
-		<a href="/people/" class="text-sm font-medium underline underline-offset-4 decoration-2">
-		view all →
+		<a
+			href="/people/"
+			class="inline-flex items-center gap-2 font-semibold text-600 hover:text-blue-700"
+		>
+			<span aria-hidden="true" class="select-none">›</span>
+			<span class="underline underline-offset-4 decoration-2">Our members</span>
 		</a>
 	</div>
 	)}
