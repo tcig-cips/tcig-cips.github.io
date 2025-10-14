@@ -1,23 +1,26 @@
 ---
+// src/components/PubTile.astro
 import { firstAuthorsEtAl } from '../lib/format.ts';
 
-const { entry } = Astro.props;
-const slug = entry.slug;
-const href = `/publications/${slug}/`;
-const thumb = entry.data.thumbnail ?? '/images/placeholder-thumb.svg';
+const {
+  entry,
+  to,                         // required: link target (e.g. "/publications/#slug" or "/publications/slug/")
+  suppressTitleTransition = false, // set true on /publications to avoid duplicate title names
+} = Astro.props;
 
+const slug  = entry.slug;
+const thumb = entry.data.thumbnail ?? '/images/placeholder-thumb.svg';
 const firstEtAl = firstAuthorsEtAl(entry.data.authors ?? [], entry.data.first_authors);
 ---
-<a href={href} aria-label={entry.data.title} class="block group">
+<a href={to} aria-label={entry.data.title} class="block group">
   <article
-    class="rounded-xl border border-black/10 p-3 transition-colors duration-200 ease-out
-           bg-white ring-0
-           group-hover:bg-indigo-50 group-hover:border-indigo-200 group-hover:shadow-md"
-    transition:name={`pub-${slug}`}
+    class="rounded-xl border border-black/10 p-3 transition-all duration-200 ease-out
+           bg-white group-hover:bg-indigo-50 group-hover:border-indigo-200 group-hover:shadow-md"
+    transition:name={`pub-${slug}`}  
   >
     <figure
       class="relative aspect-[16/9] w-full overflow-hidden rounded-lg
-             bg-white ring-1 ring-gray-200 transition-colors duration-200
+             bg-gray-50 ring-1 ring-gray-200 transition-colors duration-200
              group-hover:bg-white group-hover:ring-indigo-300"
     >
       <img
@@ -31,7 +34,11 @@ const firstEtAl = firstAuthorsEtAl(entry.data.authors ?? [], entry.data.first_au
     </figure>
 
     <div class="mt-2 font-medium line-clamp-2">
-      <span transition:name={`title-${slug}`}>{entry.data.title}</span>
+      {
+        suppressTitleTransition
+          ? entry.data.title
+          : <span transition:name={`title-${slug}`}>{entry.data.title}</span>
+      }
     </div>
 
     <div class="mt-1 text-xs text-gray-600 flex items-center gap-2">

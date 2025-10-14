@@ -1,20 +1,23 @@
 ---
-const { entry, size = 'md' } = Astro.props; // size: 'md' | 'lg'
+const { entry, size = 'md' } = Astro.props;
 const avatar = entry.data.image ?? '/images/placeholder-avatar.svg';
 
+// square sizes
 const sizeClass = size === 'lg'
-  ? 'h-44 w-44'      // PI bigger portrait
-  : 'h-36 w-36';
+  ? 'h-44 w-44'
+  : 'h-44 w-44';
 ---
-<article class="text-center">
-  <div class={`mx-auto overflow-hidden rounded-full bg-gray-100 ${sizeClass}`}>
+<article id={entry.slug} class="text-center">
+  <div
+    class={`mx-auto ${sizeClass} aspect-square rounded-xl overflow-hidden bg-gray-100 ring-1 ring-black/10`}
+    transition:name={`person-${entry.slug}`}  
+  >
     <img
       src={avatar}
       alt={entry.data.name}
-      class="h-full w-full object-cover transition duration-300 hover:scale-[1.03]"
+      class="h-full w-full object-cover transition duration-300 hover:scale-[1.02]"
       loading="lazy"
-      width="320"
-      height="320"
+      width="300" height="300"
     />
   </div>
 
@@ -24,9 +27,9 @@ const sizeClass = size === 'lg'
   </div>
 
   <div class="mt-2 flex items-center justify-center gap-3 text-sm">
-    {entry.data.website && <a class="underline hover:no-underline" href={entry.data.website}>website</a>}
-    {entry.data.scholar && <a class="underline hover:no-underline" href={entry.data.scholar}>scholar</a>}
-    {entry.data.github  && <a class="underline hover:no-underline" href={entry.data.github}>github</a>}
-    {entry.data.twitter && <a class="underline hover:no-underline" href={entry.data.twitter}>twitter</a>}
+    {entry.data.website && <a class="underline hover:no-underline" target="_blank" href={entry.data.website}>website</a>}
+    {entry.data.scholar && <a class="underline hover:no-underline" target="_blank" href={entry.data.scholar}>scholar</a>}
+    {entry.data.github  && <a class="underline hover:no-underline" target="_blank" href={entry.data.github}>github</a>}
+    {entry.data.twitter && <a class="underline hover:no-underline" target="_blank" href={entry.data.twitter}>twitter</a>}
   </div>
 </article>

@@ -1,14 +1,15 @@
 ---
 import PeopleCard from './PeopleCard.astro';
-const { title, items, large = false } = Astro.props; // items: array of collection entries
+const { title, items, large = false } = Astro.props; // title can be undefined/empty
 if (!items || items.length === 0) return;
 ---
 <section class="mb-12">
-  <h2 class="text-xl font-semibold mb-5">{title}</h2>
-
-  <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+  {title && <h2 class="text-xl font-semibold mb-5">{title}</h2>}
+  <div class={`grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${large ? 'place-items-center' : ''}`}>
     {items.map((entry) => (
-      <PeopleCard entry={entry} size={large ? 'lg' : 'md'} />
+      <div class={large ? 'scale-[1.11]' : ''}>
+        <PeopleCard entry={entry} />
+      </div>
     ))}
   </div>
 </section>

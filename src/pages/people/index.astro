@@ -5,28 +5,32 @@ import { getCollection } from 'astro:content';
 import PeopleSection from '../../components/PeopleSection.astro';
 
 const everyone = (await getCollection('people'))
-  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999));
+  .sort((a, b) =>
+    (a.data.order ?? 999) - (b.data.order ?? 999) ||
+    a.data.name.localeCompare(b.data.name)
+  );
 
-const by = (status) => everyone.filter((p) => p.data.status === status);
+const by = (status) => everyone.filter((p) => (p.data.status ?? '').toLowerCase() === status);
 
-// Make sure your MD uses these statuses to match SRG groupings:
-const PI       = by('pi');
-const Postdocs = by('postdoc');
-const PhD      = by('phd');
-const MS       = by('ms');
-const UG       = by('ug');
-const Alumni   = by('alum');
+// Buckets
+const PI        = by('pi');
+const Postdocs  = by('postdoc');
+const Students  = everyone.filter((p) => ['phd', 'ms'].includes((p.data.status ?? '').toLowerCase()));
+const UG        = by('ug');
+const Alumni    = by('alum');
+
+// Combine PI + Postdocs (PI first, then Postdocs)
+const PIAndPostdocs = [...PI, ...Postdocs];
 ---
 <BaseLayout title="People">
   <h1 class="text-3xl font-semibold mb-8">People</h1>
 
-  {PI.length > 0 && <PeopleSection title="Principal Investigator" items={PI} large={true} />}
+  {/* No section titles for these groups */}
+  {PIAndPostdocs.length > 0 && <PeopleSection items={PIAndPostdocs} />}
+  {Students.length > 0 && <PeopleSection items={Students} />}
+  {UG.length > 0 && <PeopleSection items={UG} />}
 
-  {Postdocs.length > 0 && <PeopleSection title="Postdoctoral Researchers" items={Postdocs} />}
-  {PhD.length > 0 &&     <PeopleSection title="PhD Students"            items={PhD} />}
-  {MS.length > 0 &&      <PeopleSection title="MS Students"             items={MS} />}
-  {UG.length > 0 &&      <PeopleSection title="Undergraduate Students"  items={UG} />}
-
+  {/* Keep Alumni header/list as-is (not a PeopleSection grid) */}
   {Alumni.length > 0 && (
     <section class="mb-4">
       <h2 class="text-xl font-semibold mb-3">Alumni</h2>

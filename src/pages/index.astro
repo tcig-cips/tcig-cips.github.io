@@ -1,13 +1,21 @@
 ---
-// src/pages/index.astro
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import PubTile from "../components/PubTile.astro";
 
-const TILE_COUNT = 6; // how many tiles to show in the carousel
-const SHOW_PEOPLE = false;
+const TILE_COUNT = 6;
+const SHOW_PEOPLE = true; // ← turn it back on
 
 const pubs = await getCollection("pubs");
+const peopleAll = await getCollection("people");
+
+// sort & pick active folks (skip alumni), show first 18
+const people = peopleAll
+  .filter(p => (p.data.status ?? '').toLowerCase() !== 'alum')
+  .sort((a,b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+  .slice(0, 18);
+
+const avatar = (p) => p.data.image ?? "/images/placeholder-avatar.svg";
 
 const monthToNum = (m) =>
   typeof m === "number" ? m :
@@ -61,24 +69,60 @@ const recentTiles = pubs.sort(byDateDesc).slice(0, TILE_COUNT);
 
 
     {SHOW_PEOPLE && (
-      <div class="flex flex-wrap items-center gap-2 mb-6">
-        <!-- people avatars here if you re-enable -->
-      </div>
-    )}
+	<div class="mb-6 flex items-center gap-3">
+		<div class="flex flex-wrap items-center gap-2">
+		{people.map((p) => (
+			<a href={`/people/#${p.slug}`} class="block group" aria-label={p.data.name} title={p.data.name}>
+			<div
+				class="h-10 w-10 rounded-xl overflow-hidden ring-1 ring-black/10 transition duration-200
+					group-hover:ring-blue-400 group-hover:brightness-105"
+				transition:name={`person-${p.slug}`}     
+			>
+				<img
+				src={avatar(p)}
+				alt={p.data.name}
+				class="h-full w-full object-cover"
+				loading="lazy"
+				/>
+			</div>
+			</a>
+		))}
+		</div>
+
+		{peopleAll.length > people.length && (
+		<span class="text-sm text-gray-600">+{peopleAll.length - people.length}</span>
+		)}
+		<a href="/people/" class="text-sm font-medium underline underline-offset-4 decoration-2">
+		view all →
+		</a>
+	</div>
+	)}
 
     <!-- Group description -->
     <div class="prose max-w-none mb-8">
-      <p><strong>Group description here, we are </strong> blah blah blah blah ...</p>
+      <p><strong>Group description here, we are </strong> blah blah blah blah ... Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
     </div>
 
      <!-- Recent Publications (grid) -->
-    <div class="flex items-baseline justify-between mb-3">
-      <h2 class="text-xl font-semibold">Recent Publications</h2>
-      <a href="/publications/" class="text-sm underline">view all</a>
-    </div>
+	<div class="mb-3 flex items-baseline gap-4">
+		<h2 class="text-xl font-semibold">Recent Publications</h2>
+		<a
+			href="/publications/"
+			class="inline-flex items-center gap-2 font-semibold text-600 hover:text-blue-700"
+		>
+			<span aria-hidden="true" class="select-none">›</span>
+			<span class="underline underline-offset-4 decoration-2">View all publications</span>
+		</a>
+	</div>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {recentTiles.map(p => <PubTile entry={p} context="home" />)}
+      {recentTiles.map(p => (
+		<PubTile
+			entry={p}
+			to={`/publications/#${p.slug}`}          // enables home tile → publications tile
+			suppressTitleTransition={false}           // ok here; no duplicates on the home page
+		/>
+		))}
     </div>
 
     <!-- (Optional) Recent talks grid could go here, below the carousel) -->
