@@ -1,0 +1,49 @@
+---
+// src/pages/people/index.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import PeopleSection from '../../components/PeopleSection.astro';
+
+const everyone = (await getCollection('people'))
+  .sort((a, b) => (a.data.order ?? 999) - (b.data.order ?? 999));
+
+const by = (status) => everyone.filter((p) => p.data.status === status);
+
+// Make sure your MD uses these statuses to match SRG groupings:
+const PI       = by('pi');
+const Postdocs = by('postdoc');
+const PhD      = by('phd');
+const MS       = by('ms');
+const UG       = by('ug');
+const Alumni   = by('alum');
+---
+<BaseLayout title="People">
+  <h1 class="text-3xl font-semibold mb-8">People</h1>
+
+  {PI.length > 0 && <PeopleSection title="Principal Investigator" items={PI} large={true} />}
+
+  {Postdocs.length > 0 && <PeopleSection title="Postdoctoral Researchers" items={Postdocs} />}
+  {PhD.length > 0 &&     <PeopleSection title="PhD Students"            items={PhD} />}
+  {MS.length > 0 &&      <PeopleSection title="MS Students"             items={MS} />}
+  {UG.length > 0 &&      <PeopleSection title="Undergraduate Students"  items={UG} />}
+
+  {Alumni.length > 0 && (
+    <section class="mb-4">
+      <h2 class="text-xl font-semibold mb-3">Alumni</h2>
+      <ul class="text-sm leading-7 text-gray-800 list-disc pl-5">
+        {Alumni.map((p) => (
+          <li>
+            <span class="font-medium">{p.data.name}</span>
+            {p.data.role && <span class="text-gray-600"> — {p.data.role}</span>}
+            {p.data.website && (
+              <>
+                {' '}<span>·</span>{' '}
+                <a class="underline hover:no-underline" href={p.data.website}>website</a>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</BaseLayout>

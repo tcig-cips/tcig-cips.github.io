@@ -1,0 +1,87 @@
+---
+// src/pages/publications/[slug].astro
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+// 1) Generate all paper pages at build time
+export async function getStaticPaths() {
+  const pubs = await getCollection("pubs");
+  return pubs.map((p) => ({
+    params: { slug: p.slug },
+    props: { entry: p }, // pass the collection entry via props
+  }));
+}
+
+// 2) Page props
+const { entry } = Astro.props;
+
+// Helpers/fields
+const slug    = entry.slug;
+const title   = entry.data.title;
+const authors = entry.data.authors ?? [];
+const venue   = entry.data.venue ?? "";
+const year    = entry.data.year ?? "";
+const abstract = entry.data.abstract ?? null;
+const bibtex   = entry.data.bibtex ?? null;
+
+// Preferred media for detail page
+const thumb = entry.data.teaser ?? entry.data.thumbnail ?? null;
+
+// YouTube: allow either `youtube: ID` or `video: full YouTube url`
+const youtubeId =
+  entry.data.youtube ??
+  (/^https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/.exec(entry.data.video || "")?.[1] ?? null);
+
+// Render MD body if no abstract
+const Rendered = await entry.render();
+const Body = Rendered.Content;
+---
+<BaseLayout title={title}>
+  <!-- Title block -->
+  <header class="mb-6">
+    <h1 class="text-3xl font-semibold" transition:name={`title-${slug}`}>{title}</h1>
+    {authors.length > 0 && <p class="mt-2 text-gray-800">{authors.join(", ")}</p>}
+    {(venue || year) && (
+      <p class="mt-1 text-sm text-gray-600">{venue}{venue && year ? " · " : ""}{year}</p>
+    )}
+  </header>
+
+  <!-- Media + Abstract block -->
+  <section class="grid gap-6 md:grid-cols-2 md:items-start mb-8">
+    <div class="w-full">
+      {youtubeId ? (
+        <div class="aspect-video w-full overflow-hidden rounded-lg ring-1 ring-black/10" transition:name={`media-${slug}`}>
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}`}
+            title="Paper video"
+            class="h-full w-full"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          />
+        </div>
+      ) : thumb ? (
+        <img src={thumb} alt="" class="w-full rounded-lg ring-1 ring-black/10 object-cover" loading="lazy" transition:name={`media-${slug}`} />
+      ) : null}
+    </div>
+
+    <div class="prose max-w-none">
+      {abstract ? <p>{abstract}</p> : <Body />}
+      {/* links */}
+      <div class="not-prose mt-4 flex flex-wrap gap-2">
+        {entry.data.project && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.project}>webpage</a>}
+        {entry.data.pdf     && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.pdf}>pdf</a>}
+        {entry.data.code    && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.code}>code</a>}
+        {entry.data.video   && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.video}>video</a>}
+      </div>
+    </div>
+  </section>
+
+  {/* BibTeX block */}
+  {bibtex && (
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold mb-3">BibTeX</h2>
+      <pre class="rounded-lg border bg-gray-50 p-4 overflow-x-auto text-sm"><code>{bibtex}</code></pre>
+    </section>
+  )}
+</BaseLayout>

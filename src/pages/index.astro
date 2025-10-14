@@ -1,11 +1,118 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+// src/pages/index.astro
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import PubTile from "../components/PubTile.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const TILE_COUNT = 6; // how many tiles to show in the carousel
+const SHOW_PEOPLE = false;
+
+const pubs = await getCollection("pubs");
+
+const monthToNum = (m) =>
+  typeof m === "number" ? m :
+  typeof m === "string" ? new Date(`${m} 1, 2000`).getMonth() + 1 : 12;
+
+const byDateDesc = (a, b) =>
+  (b.data.year - a.data.year) ||
+  (monthToNum(b.data.month) - monthToNum(a.data.month));
+
+const recentTiles = pubs.sort(byDateDesc).slice(0, TILE_COUNT);
 ---
+<BaseLayout title="TCIG/CIPS" noTopPad>
+  <section
+	class="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] mb-8 overflow-hidden"
+	aria-label="Hero"
+	>
+	<!-- Background image -->
+	<img
+		src="/images/hero.jpg"
+		alt=""
+		class="absolute inset-0 h-full w-full object-cover"
+		loading="eager"
+		fetchpriority="high"
+	/>
 
-<Layout>
-	<Welcome />
-</Layout>
+	<!-- Top gradient for white text readability -->
+	<div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-transparent"></div>
+
+	<!-- Set hero height here -->
+	<div class="h-[18vh] min-h-[120px] sm:h-[16vh] md:h-[18vh]"></div>
+
+	<!-- Top-aligned title (kept within site content width) -->
+	<div class="pointer-events-auto absolute inset-x-0 top-0 z-10">
+		<div class="mx-auto max-w-6xl px-4 pt-6 sm:pt-8 md:pt-10">
+		<h1 class="text-white drop-shadow-lg [text-wrap:balance] text-3xl sm:text-4xl font-bold leading-tight">
+			<a
+			href="https://www.compimaging.dgp.toronto.edu/home"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="text-white/95 hover:underline text-lg align-middle"
+			>
+			Toronto Computational Imaging Group
+			</a>
+			<span class="text-white/80 text-lg font-normal align-middle"> / </span>
+			<br />
+			<span>Computational Imaging for Physical Sciences</span>
+		</h1>
+		</div>
+	</div>
+	</section>
+
+
+    {SHOW_PEOPLE && (
+      <div class="flex flex-wrap items-center gap-2 mb-6">
+        <!-- people avatars here if you re-enable -->
+      </div>
+    )}
+
+    <!-- Group description -->
+    <div class="prose max-w-none mb-8">
+      <p><strong>Group description here, we are </strong> blah blah blah blah ...</p>
+    </div>
+
+     <!-- Recent Publications (grid) -->
+    <div class="flex items-baseline justify-between mb-3">
+      <h2 class="text-xl font-semibold">Recent Publications</h2>
+      <a href="/publications/" class="text-sm underline">view all</a>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {recentTiles.map(p => <PubTile entry={p} context="home" />)}
+    </div>
+
+    <!-- (Optional) Recent talks grid could go here, below the carousel) -->
+  </section>
+
+  <!-- Tiny script to handle the buttons + keyboard -->
+  <script>
+    const track = document.getElementById('pub-track');
+    const left = document.querySelector('[data-action="scroll-left"]');
+    const right = document.querySelector('[data-action="scroll-right"]');
+
+    const step = () => {
+      // Scroll ~one card at a time based on the first child width
+      const first = track?.querySelector(':scope > *');
+      return first ? first.getBoundingClientRect().width + 16 /* gap */ : 320;
+    };
+
+    left?.addEventListener('click', () => {
+      track?.scrollBy({ left: -step(), behavior: 'smooth' });
+    });
+    right?.addEventListener('click', () => {
+      track?.scrollBy({ left: step(), behavior: 'smooth' });
+    });
+
+    // Keyboard accessibility: arrow keys when the track is focused
+    track?.setAttribute('tabindex', '0');
+    track?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        track.scrollBy({ left: step(), behavior: 'smooth' });
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        track.scrollBy({ left: -step(), behavior: 'smooth' });
+      }
+    });
+  </script>
+</BaseLayout>
