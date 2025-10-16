@@ -1,9 +1,9 @@
 ---
-title: Computational Imaging Systems
+title: Physics-based Inverse Problems
 image: /images/hero.jpg
-kicker: Optics × Sensors × Algorithms
-blurb: End-to-end co-design of imaging hardware and reconstruction algorithms to push sensing limits.
-order: 10
+kicker: Rendering & Reconstruction
+blurb: Estimating structure and fields from sparse or indirect measurements.
+order: 20
 ---
 
-We develop computational imaging systems that jointly optimize optics, sensors, and reconstruction algorithms to enable measurements beyond conventional hardware limits. Applications include low-light, fast, and indirect imaging scenarios.
+We study forward and inverse problems in physics-based imaging, drawing on rendering, variational methods, and differentiable simulation.

@@ -2,6 +2,9 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import PubTile from "../components/PubTile.astro";
+import NewsList from "../components/NewsList.astro";
+import ProspectiveStudents from '../components/ProspectiveStudents.astro';
+
 
 const TILE_COUNT = 6;
 const SHOW_PEOPLE = true; // ← turn it back on
@@ -151,6 +154,16 @@ const focusItems = research_focus.map((entry) => ({
 		/>
 		))}
     </div>
+
+	<NewsList limit={10} />
+
+	<!-- <ProspectiveStudents
+		email="your.name@utoronto.ca"
+		links={[
+		{ label: "U of T Graduate Admissions", href: "https://www.sgs.utoronto.ca/future-students/applying/" },
+		{ label: "Dept. of Computer Science (DCS) Admissions", href: "https://web.cs.toronto.edu/graduate/prospective" },
+		]}
+	/> -->
 
   <!-- Tiny script to handle the buttons + keyboard -->
   <script>

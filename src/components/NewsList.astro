@@ -1,0 +1,107 @@
+---
+import { getCollection } from 'astro:content';
+
+const { limit = 10, title = 'News & Highlights' } = Astro.props;
+
+// sort newest → oldest
+const entries = (await getCollection('news'))
+  .sort((a, b) => +b.data.date - +a.data.date);
+
+const topRaw  = entries.slice(0, limit);
+const restRaw = entries.slice(limit);
+
+// pre-render markdown
+const renderBatch = async (arr) =>
+  Promise.all(arr.map(async (e) => {
+    const R = await e.render();
+    return { entry: e, Content: R.Content };
+  }));
+
+const top  = await renderBatch(topRaw);
+const rest = await renderBatch(restRaw);
+
+// unique id for aria-controls
+const uid = 'news_' + Math.random().toString(36).slice(2, 8);
+
+const fmt = (d: Date | string) =>
+  new Date(d).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+<section class="mt-10" aria-labelledby={`${uid}-heading`}>
+  <div class="mb-3 flex items-baseline gap-4">
+    <h2 id={`${uid}-heading`} class="text-xl font-semibold">{title}</h2>
+
+    {entries.length > limit && (
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 font-semibold text-600 hover:text-blue-700"
+        data-news-toggle
+        aria-expanded="false"
+        aria-controls={`${uid}-rest`}
+      >
+        <span aria-hidden="true">›</span>
+        <span class="underline underline-offset-4 decoration-2">Show all</span>
+      </button>
+    )}
+  </div>
+
+  <div class="overflow-x-auto rounded-xl border">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50 text-gray-600">
+        <tr>
+          <th class="px-3 py-2 text-left w-36">Date</th>
+          <th class="px-3 py-2 text-left">News</th>
+        </tr>
+      </thead>
+
+      <!-- Top N -->
+      <tbody class="divide-y">
+        {top.map(({ entry, Content }) => (
+          <tr id={entry.slug}>
+            <td class="whitespace-nowrap px-3 py-2 text-gray-600 align-top">
+              <time datetime={new Date(entry.data.date).toISOString()} class="tabular-nums">
+                {fmt(entry.data.date)}
+              </time>
+            </td>
+            <td class="px-3 py-2 align-top">
+              <div class="prose prose-sm max-w-none">
+                <Content />
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+
+      <!-- Rest (hidden until toggled) -->
+      {rest.length > 0 && (
+      <tr>
+        <td colspan="2" class="p-0">
+          <div
+            id={`${uid}-rest`}
+            class="overflow-hidden max-h-0 opacity-0 transition-[max-height,opacity] duration-300 ease-out"
+            data-news-panel
+          >
+            <table class="min-w-full text-sm">
+              <tbody class="divide-y">
+                {rest.map(({ entry, Content }) => (
+                  <tr id={entry.slug}>
+                    <td class="whitespace-nowrap px-3 py-2 text-gray-600 align-top">
+                      <time datetime={new Date(entry.data.date).toISOString()} class="tabular-nums">
+                        {fmt(entry.data.date)}
+                      </time>
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                      <div class="prose prose-sm max-w-none">
+                        <Content />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+    )}
+    </table>
+  </div>
+</section>

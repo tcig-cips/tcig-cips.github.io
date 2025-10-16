@@ -80,4 +80,15 @@ const research_focus = defineCollection({
   }),
 });
 
-export const collections = { people, pubs, talks, courses, research_focus };
+const news = defineCollection({
+  type: 'content',
+  schema: z.object({
+    date: z.coerce.date(),      // YYYY-MM-DD recommended; coerces string→Date
+    // Optional fields if you want:
+    link: z.string().url().optional(),
+    pin: z.boolean().optional(),   // if you ever want to pin items to the top
+  }),
+});
+
+
+export const collections = { people, pubs, news, talks, courses, research_focus };

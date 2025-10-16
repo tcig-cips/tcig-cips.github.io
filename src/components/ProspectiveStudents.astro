@@ -1,0 +1,71 @@
+---
+/**
+ * Props you can customize per site:
+ * - title: string
+ * - email: string
+ * - links: { label: string, href: string }[]
+ */
+const {
+  title = "For Prospective Students",
+  email = "your.name@utoronto.ca",
+  links = [
+    { label: "U of T Graduate Admissions", href: "https://www.sgs.utoronto.ca/future-students/applying/" },
+    { label: "Dept. of Computer Science (DCS) Admissions", href: "https://web.cs.toronto.edu/graduate/prospective" },
+    { label: "Dynamic Graphics Project (DGP)", href: "https://www.dgp.toronto.edu/" },
+    { label: "TCIG", href: "https://www.compimaging.dgp.toronto.edu/home/" },
+  ],
+} = Astro.props;
+---
+
+<section class="mt-12">
+  <h2 class="text-2xl font-semibold mb-3">{title}</h2>
+
+  <div class="prose max-w-none">
+    <p>
+      We welcome inquiries from motivated students interested in computational imaging,
+      inverse problems, and vision/graphics. Please read the following before emailing.
+    </p>
+
+    <h3>How to apply</h3>
+    <ul>
+      <li>All graduate admissions are handled centrally by the University/department. Please apply through the official portals below.</li>
+      <li>You may list our group/faculty in your statement if your interests align.</li>
+    </ul>
+
+    <div class="not-prose mt-3">
+      <ul class="flex flex-wrap gap-2 text-sm">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50">
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <h3 class="mt-6">If you email us</h3>
+    <ul>
+      <li>Include a 1–2 paragraph summary of your research interests and why our group is a good fit.</li>
+      <li>Attach (or link) your CV, transcripts (unofficial are fine), and any publications or research write-ups.</li>
+      <li>Point to one or two of our recent papers and briefly say what you found interesting.</li>
+    </ul>
+    <p class="mt-2">
+      Contact: <a class="underline" href={`mailto:${email}`}>{email}</a>
+    </p>
+
+    <h3 class="mt-6">FAQs</h3>
+    <details class="group rounded-lg border p-3">
+      <summary class="cursor-pointer font-medium">Can you admit me directly?</summary>
+      <p class="mt-2 text-gray-700">No—offers are issued only through the department/university admissions process.</p>
+    </details>
+    <details class="group rounded-lg border p-3 mt-2">
+      <summary class="cursor-pointer font-medium">Do I need to contact you before applying?</summary>
+      <p class="mt-2 text-gray-700">Not required. A concise email helps us notice your application, but the portal is what matters.</p>
+    </details>
+    <details class="group rounded-lg border p-3 mt-2">
+      <summary class="cursor-pointer font-medium">Funding</summary>
+      <p class="mt-2 text-gray-700">Admitted graduate students are typically funded via a combination of TA/RA and scholarships, per departmental norms.</p>
+    </details>
+  </div>
+</section>

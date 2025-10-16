@@ -122,50 +122,123 @@ const { title = 'TCIG/CIPS', noTopPad = false } = Astro.props;
 
 
     <script is:inline>
-    (function () {
-      function getEls() {
-        return {
-          btn:   document.getElementById('nav-toggle'),
-          panel: document.getElementById('mobile-menu'),
-        };
-      }
-
-      function setOpen(open) {
-        const { btn, panel } = getEls();
-        if (!btn || !panel) return;
-        btn.setAttribute('aria-expanded', String(open));
-        btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-        panel.classList.toggle('hidden', !open);
-      }
-
-      // Delegated click handling: works across SPA navigations
-      document.addEventListener('click', (e) => {
-        const toggle = e.target.closest('#nav-toggle');
-        if (toggle) {
-          const expanded = toggle.getAttribute('aria-expanded') === 'true';
-          setOpen(!expanded);
-          return;
+      (function () {
+        function getEls() {
+          return {
+            btn:   document.getElementById('nav-toggle'),
+            panel: document.getElementById('mobile-menu'),
+          };
         }
-        // Close if a link inside the panel was clicked
-        const panel = document.getElementById('mobile-menu');
-        if (panel && panel.contains(e.target) && e.target.closest('a[href]')) {
-          setOpen(false);
+
+        function setOpen(open) {
+          const { btn, panel } = getEls();
+          if (!btn || !panel) return;
+          btn.setAttribute('aria-expanded', String(open));
+          btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+          panel.classList.toggle('hidden', !open);
         }
-      });
 
-      // Close after ClientRouter navigation & on Escape
-      document.addEventListener('astro:after-swap', () => setOpen(false));
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') setOpen(false);
-      });
+        // Smooth expand/collapse of a panel with max-height + opacity
+        function smoothToggle(panel, expand) {
+          if (!panel) return;
 
-      // Initialize closed on first load and on page-load events
-      setOpen(false);
-      document.addEventListener('astro:page-load', () => setOpen(false));
-    })();
+          // Ensure we can measure
+          panel.style.willChange = 'max-height, opacity';
+          panel.style.overflow = 'hidden';
+
+          if (expand) {
+            // From collapsed → expanded
+            // Start from current computed size
+            panel.classList.remove('hidden');              // just in case
+            panel.style.maxHeight = '0px';
+            panel.style.opacity = '0';
+
+            // Next frame: animate to content height
+            requestAnimationFrame(() => {
+              const h = panel.scrollHeight;
+              panel.style.maxHeight = h + 'px';
+              panel.style.opacity = '1';
+            });
+
+            // After transition, set to 'none' to allow content to expand naturally
+            const onEnd = (e) => {
+              if (e.propertyName !== 'max-height') return;
+              panel.style.maxHeight = 'none'; // Changed from '' to 'none'
+              panel.style.willChange = '';
+              panel.removeEventListener('transitionend', onEnd);
+            };
+            panel.addEventListener('transitionend', onEnd);
+          } else {
+            // From expanded → collapsed
+            const h = panel.scrollHeight;
+            panel.style.maxHeight = h + 'px'; // set current height
+            panel.style.opacity = '1';
+
+            // Next frame: animate to 0
+            requestAnimationFrame(() => {
+              panel.style.maxHeight = '0px';
+              panel.style.opacity = '0';
+            });
+
+            const onEnd = (e) => {
+              if (e.propertyName !== 'max-height') return;
+              // keep it collapsed
+              panel.style.willChange = '';
+              panel.removeEventListener('transitionend', onEnd);
+            };
+            panel.addEventListener('transitionend', onEnd);
+          }
+        }
+
+        // Delegated click handling: works across SPA navigations
+        document.addEventListener('click', (e) => {
+          // Hamburger
+          const toggle = e.target.closest('#nav-toggle');
+          if (toggle) {
+            const expanded = toggle.getAttribute('aria-expanded') === 'true';
+            setOpen(!expanded);
+            return;
+          }
+          const panel = document.getElementById('mobile-menu');
+          if (panel && panel.contains(e.target) && e.target.closest('a[href]')) {
+            setOpen(false);
+            return;
+          }
+
+          // News "Show all / Show less"
+          const newsBtn = e.target.closest('[data-news-toggle]');
+          if (newsBtn) {
+            const controlsId = newsBtn.getAttribute('aria-controls');
+            if (!controlsId) return;
+            const rest = document.getElementById(controlsId);
+            if (!rest) return;
+
+            const next = !(newsBtn.getAttribute('aria-expanded') === 'true');
+
+            // Animate
+            smoothToggle(rest, next);
+
+            // Update all buttons tied to this panel (top & bottom)
+            document.querySelectorAll(`[data-news-toggle][aria-controls="${controlsId}"]`).forEach((btn) => {
+              btn.setAttribute('aria-expanded', String(next));
+              const label = btn.querySelector('span:last-child');
+              const chevron = btn.querySelector('span:first-child');
+              if (label)   label.textContent   = next ? 'Show less' : 'Show all';
+              if (chevron) chevron.textContent = next ? '‹'        : '›';
+            });
+            return;
+          }
+        });
+
+        // Close after ClientRouter navigation & on Escape
+        document.addEventListener('astro:after-swap', () => setOpen(false));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+
+        // Initialize closed on first load and on page-load events
+        setOpen(false);
+        document.addEventListener('astro:page-load', () => setOpen(false));
+      })();
     </script>
-
-
 
     <main class={`mx-auto max-w-6xl px-4 ${noTopPad ? 'pt-0' : 'pt-10'} pb-10`} transition:name="content">
       <slot />
@@ -243,11 +316,11 @@ const { title = 'TCIG/CIPS', noTopPad = false } = Astro.props;
                   class="h-8 w-auto object-contain" loading="lazy" decoding="async" />
               </a>
               <a href="https://www.compimaging.dgp.toronto.edu/home/" aria-label="TCIG home" title="TCIG home">
-                <img src="/tcig_webicon.png" alt="TCIG"
+                <img src="/tcig_webicon_full.png" alt="TCIG"
                   class="h-8 w-auto object-contain" loading="lazy" decoding="async" />
               </a>
               <a href="https://www.dgp.toronto.edu/" aria-label="DGP home" title="DGP home">
-                <img src="/dgp.jpg" alt="DGP"
+                <img src="/dgp.svg" alt="DGP"
                   class="h-8 w-auto object-contain" loading="lazy" decoding="async" />
               </a>
             </div>
