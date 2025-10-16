@@ -1,6 +1,6 @@
 ---
 name: Aviad Levis
-role: Assitant Professor
+role: Assistant Professor
 status: pi
 order: 0
 image: /images/people/aviad.avif

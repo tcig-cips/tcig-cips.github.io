@@ -1,0 +1,64 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const entries = (await getCollection('research_focus'))
+  .sort((a,b) => (a.data.order ?? 999) - (b.data.order ?? 999));
+---
+<BaseLayout title="Research Focus">
+  <h1 class="text-3xl font-semibold mb-6">Research Focus</h1>
+
+  <div class="space-y-10">
+    {await Promise.all(entries.map(async (entry) => {
+      const Rendered = await entry.render();
+      const Content = Rendered.Content;
+      return (
+        <section id={entry.slug} class="scroll-mt-24" aria-labelledby={`${entry.slug}-title`}>
+          <div class="grid gap-6 md:grid-cols-5 md:items-start">
+            <!-- Image -->
+            <div class="md:col-span-2">
+              <div
+                class="relative overflow-hidden rounded-2xl ring-1 ring-black/10 aspect-[16/9] md:aspect-[4/3]"
+                transition:name={`focus-${entry.slug}`}
+              >
+                <img
+                  src={entry.data.image}
+                  alt=""
+                  class="absolute inset-0 h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-black/0 to-transparent"></div>
+              </div>
+            </div>
+
+            <!-- Text -->
+            <div class="md:col-span-3">
+              {entry.data.kicker && (
+                <div class="text-xs uppercase tracking-widest text-gray-500 mb-2">
+                  {entry.data.kicker}
+                </div>
+              )}
+              <h2 id={`${entry.slug}-title`} class="text-2xl font-semibold mb-2">
+                {entry.data.title}
+              </h2>
+
+              <!-- Prefer body content; fall back to blurb -->
+              {Rendered && Content
+                ? <div class="prose max-w-none"><Content /></div>
+                : (entry.data.blurb && <p class="text-gray-800">{entry.data.blurb}</p>)
+              }
+
+              <!-- Optional: related publications anchor -->
+              <div class="mt-3">
+                <a href={`/publications/#${entry.slug}`} class="text-sm font-medium underline underline-offset-4">
+                  View related publications
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }))}
+  </div>
+</BaseLayout>

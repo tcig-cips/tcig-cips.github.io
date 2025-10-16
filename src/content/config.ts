@@ -69,4 +69,15 @@ const courses = defineCollection({
   }),
 });
 
-export const collections = { people, pubs, talks, courses };
+const research_focus = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    image: z.string(),          // path under /public, e.g. /images/foci/nsr.jpg
+    kicker: z.string().optional(),
+    blurb: z.string().optional(),  // short teaser for the tile
+    order: z.number().default(999), // sort on the front page & research page
+  }),
+});
+
+export const collections = { people, pubs, talks, courses, research_focus };

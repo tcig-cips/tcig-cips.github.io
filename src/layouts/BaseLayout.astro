@@ -25,33 +25,247 @@ const { title = 'TCIG/CIPS', noTopPad = false } = Astro.props;
         line-height: 1.25;
         max-height: 2.5em; /* 2 × line-height */
       }
+      ::view-transition-old(focus-*) ,
+      ::view-transition-new(focus-*) {
+        border-radius: 1rem; /* rounded-2xl */
+        overflow: hidden;
+      }
+      #mobile-menu[data-open="true"] { transform: scaleY(1); }
+      #mobile-menu[data-open="false"] { transform: scaleY(0); }
+      html, body { overflow-x: clip; }
     </style>
   </head>
   <body class="min-h-screen bg-white text-gray-900">
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b" transition:persist>
-      <nav class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3">
-          <img src="/cips_logo.svg" alt="" class="h-12 w-12" transition:name="logo" />
-          <span class="font-semibold" transition:name="brand">TCIG/CIPS</span>
-        </a>
-        <ul class="flex gap-6 text-sm">
-          <li><a class="hover:underline" href="/">Home</a></li>
-          <li><a class="hover:underline" href="/publications/">Research Areas</a></li>
-          <li><a class="hover:underline" href="/publications/">Publications</a></li>
-          <li><a class="hover:underline" href="/people/">People</a></li>
-          <li><a class="hover:underline" href="https://www.compimaging.dgp.toronto.edu/home/">TCIG</a></li>
-          
-        </ul>
-      </nav>
+      <div class="relative">
+        <nav class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between min-h-[56px]">
+          <!-- Brand -->
+          <a href="/" class="flex items-center gap-3">
+            <img src="/cips_logo.svg" alt="" class="h-12 w-12" transition:name="logo" />
+            <span class="font-semibold" transition:name="brand">TCIG/CIPS</span>
+          </a>
+
+          <!-- Desktop nav -->
+          <ul class="hidden md:flex items-center gap-6 text-sm">
+            <li><a class="hover:underline" href="/">Home</a></li>
+            <li><a class="hover:underline" href="/research/">Research Focus</a></li>
+            <li><a class="hover:underline" href="/publications/">Publications</a></li>
+            <li><a class="hover:underline" href="/people/">People</a></li>
+
+            <li>
+              <a
+                href="https://www.compimaging.dgp.toronto.edu/home/"
+                class="inline-flex items-center justify-center h-16"
+                aria-label="TCIG home"
+                title="TCIG home"
+              >
+                <img
+                  src="/tcig_webicon.png"
+                  alt=""
+                  class="block h-16 w-16 object-contain select-none transition hover:opacity-80"
+                  decoding="async"
+                  loading="lazy"
+                />
+              </a>
+            </li>
+          </ul>
+
+          <!-- Mobile toggle -->
+          <button
+            id="nav-toggle"
+            type="button"
+            class="md:hidden inline-flex items-center justify-center rounded-lg p-2 ring-1 ring-black/10 hover:bg-gray-50"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+            aria-label="Open menu"
+          >
+            <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/>
+            </svg>
+          </button>
+        </nav>
+
+        <!-- Mobile menu (absolute below the bar; hidden by default) -->
+        <div
+          id="mobile-menu"
+          class="md:hidden absolute inset-x-0 top-full bg-white/95 backdrop-blur border-b shadow-lg hidden z-40"
+        >
+          <ul class="mx-auto max-w-6xl px-4 pb-4 pt-2 space-y-2 text-sm">
+            <li><a class="block rounded px-3 py-2 hover:bg-gray-50" href="/">Home</a></li>
+            <li><a class="block rounded px-3 py-2 hover:bg-gray-50" href="/research/">Research Focus</a></li>
+            <li><a class="block rounded px-3 py-2 hover:bg-gray-50" href="/publications/">Publications</a></li>
+            <li><a class="block rounded px-3 py-2 hover:bg-gray-50" href="/people/">People</a></li>
+
+            <!-- Icon link -->
+            <li>
+              <a
+                href="https://www.compimaging.dgp.toronto.edu/home/"
+                class="flex items-center gap-2 rounded px-3 py-2 hover:bg-gray-50"
+                aria-label="TCIG home"
+                title="TCIG home"
+              >
+                <img
+                  src="/tcig_webicon.png"
+                  alt=""
+                  width="20"
+                  height="20"
+                  class="h-14 w-14 object-contain select-none"
+                  decoding="async"
+                  loading="lazy"
+                />
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </header>
+
+
+    <script is:inline>
+    (function () {
+      function getEls() {
+        return {
+          btn:   document.getElementById('nav-toggle'),
+          panel: document.getElementById('mobile-menu'),
+        };
+      }
+
+      function setOpen(open) {
+        const { btn, panel } = getEls();
+        if (!btn || !panel) return;
+        btn.setAttribute('aria-expanded', String(open));
+        btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        panel.classList.toggle('hidden', !open);
+      }
+
+      // Delegated click handling: works across SPA navigations
+      document.addEventListener('click', (e) => {
+        const toggle = e.target.closest('#nav-toggle');
+        if (toggle) {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          setOpen(!expanded);
+          return;
+        }
+        // Close if a link inside the panel was clicked
+        const panel = document.getElementById('mobile-menu');
+        if (panel && panel.contains(e.target) && e.target.closest('a[href]')) {
+          setOpen(false);
+        }
+      });
+
+      // Close after ClientRouter navigation & on Escape
+      document.addEventListener('astro:after-swap', () => setOpen(false));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
+      });
+
+      // Initialize closed on first load and on page-load events
+      setOpen(false);
+      document.addEventListener('astro:page-load', () => setOpen(false));
+    })();
+    </script>
+
+
 
     <main class={`mx-auto max-w-6xl px-4 ${noTopPad ? 'pt-0' : 'pt-10'} pb-10`} transition:name="content">
       <slot />
     </main>
 
-    <footer class="border-t py-10 text-sm text-gray-500">
-      <div class="mx-auto max-w-6xl px-4">
-        © {new Date().getFullYear()} TCIG/CIPS. Design is inspired by the <a href="https://www.scenerepresentations.org/" class="underline hover:text-gray-700">MIT Scene Representation Group's web page</a>.
+    <footer class="border-t bg-gray-50/60 text-sm text-gray-600">
+      <div class="mx-auto max-w-6xl px-4 py-10">
+        <div class="grid gap-8 md:grid-cols-4">
+          <!-- Brand + blurb -->
+          <section>
+            <div class="flex items-center gap-2 mb-3">
+              <img src="/cips_logo.svg" alt="" class="h-8 w-8" />
+              <span class="font-semibold text-gray-900">TCIG/CIPS</span>
+            </div>
+            <p class="leading-6">
+              Computational Imaging for Physical Sciences (CIPS) is a research group within the
+              Toronto Computational Imaging Group, focused on inverse problems, vision, and graphics.
+            </p>
+          </section>
+
+          <!-- Site links -->
+          <section>
+            <h2 class="text-gray-900 font-semibold mb-3">Explore</h2>
+            <ul class="space-y-2">
+              <li><a class="hover:underline" href="/">Home</a></li>
+              <li><a class="hover:underline" href="/research/">Research Focus</a></li>
+              <li><a class="hover:underline" href="/publications/">Publications</a></li>
+              <li><a class="hover:underline" href="/people/">People</a></li>
+            </ul>
+          </section>
+
+          <!-- Contact (optional) -->
+          <section>
+            <h2 class="text-gray-900 font-semibold mb-3">Contact</h2>
+            <ul class="space-y-2">
+              <!-- Replace with your actual group email/location if you want -->
+              <li>
+                <a class="hover:underline" href="mailto:info@example.org">info@example.org</a>
+              </li>
+              <li>University of Toronto</li>
+              <li>40 St. George St, Toronto, ON</li>
+            </ul>
+          </section>
+
+          <!-- Affiliations -->
+          <section>
+            <h2 class="text-gray-900 font-semibold mb-3">Affiliations</h2>
+            <ul class="space-y-2">
+              <li>
+                <a class="inline-flex items-center gap-2 hover:underline"
+                  href="https://www.utoronto.ca/" target="_blank" rel="noopener noreferrer">
+                  <span>University of Toronto</span>
+                </a>
+              </li>
+              <li>
+                <a class="inline-flex items-center gap-2 hover:underline"
+                  href="https://www.compimaging.dgp.toronto.edu/home/" target="_blank" rel="noopener noreferrer">
+                  <span>Toronto Computational Imaging Group (TCIG)</span>
+                </a>
+              </li>
+              <li>
+                <a class="inline-flex items-center gap-2 hover:underline"
+                  href="https://www.dgp.toronto.edu/" target="_blank" rel="noopener noreferrer">
+                  <span>Dynamic Graphics Project (DGP)</span>
+                </a>
+              </li>
+            </ul>
+
+            <!-- Optional: logo strip -->
+            <div class="mt-4 flex items-center gap-4">
+              <!-- Drop logo files in /public/ and adjust names as needed -->
+
+              <a href="https://www.utoronto.ca/" aria-label="University of Toronto" title="University of Toronto">
+                <img src="/uoft.png" alt="University of Toronto"
+                  class="h-8 w-auto object-contain" loading="lazy" decoding="async" />
+              </a>
+              <a href="https://www.compimaging.dgp.toronto.edu/home/" aria-label="TCIG home" title="TCIG home">
+                <img src="/tcig_webicon.png" alt="TCIG"
+                  class="h-8 w-auto object-contain" loading="lazy" decoding="async" />
+              </a>
+              <a href="https://www.dgp.toronto.edu/" aria-label="DGP home" title="DGP home">
+                <img src="/dgp.jpg" alt="DGP"
+                  class="h-8 w-auto object-contain" loading="lazy" decoding="async" />
+              </a>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="border-t">
+        <div class="mx-auto max-w-6xl px-4 py-6 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Toronto Computational Imaging Group.</p>
+          <p class="text-gray-500">
+            Design elements are inspired by the
+            <a href="https://www.scenerepresentations.org/" class="underline hover:text-gray-700">MIT Scene Representation Group</a>.
+            Gravitational lensing video based on a shader by
+            <a href="https://www.shadertoy.com/view/tsBXW3" class="underline hover:text-gray-700">set113</a>.
+          </p>
+        </div>
       </div>
     </footer>
   </body>
