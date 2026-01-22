@@ -6,6 +6,7 @@ import NewsList from "../components/NewsList.astro";
 import ProspectiveStudents from '../components/ProspectiveStudents.astro';
 import { getCollectionName, focusHref } from "../data/focusCollections";
 
+import PhotoCarousel from "../components/PhotoCarousel.astro";
 
 const TILE_COUNT = 6;
 const SHOW_PEOPLE = true; // ← turn it back on
@@ -143,7 +144,11 @@ const focusItems = await Promise.all(focusMeta.map(async (entry) => {
       <p><strong>Physics-Informed Vision and Imaging</strong> is a research group focused on advancing the science of imaging through novel sensors, physics-aware computation, and machine learning. We push the limits of what can be seen — revealing new insights about our world and the cosmos.</p>
     </div>
 
-	<FocusGrid items={focusItems} />
+	<!-- <FocusGrid items={focusItems} /> -->
+	
+	<PhotoCarousel limit={12} title="Group Photos" />
+
+	<FocusGrid items={focusItems} heading="Research Focus" ratio="aspect-[20/9]" />
 
      <!-- Recent Publications (grid) -->
 	<div class="mb-3 flex items-baseline gap-4">

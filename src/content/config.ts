@@ -143,5 +143,15 @@ const outreach = defineCollection({
     })).optional(),
   }),
 });
+const photos = defineCollection({
+  type: "content", // ← markdown files
+  schema: z.object({
+    caption: z.string(),
+    image: z.string(),                 // e.g. /images/social/pic.jpg (in /public)
+    date: z.coerce.date().optional(),  // for sorting (newest first)
+    link: z.string().url().optional(), // optional external link
+    order: z.number().optional(),      // optional manual ordering (lower = earlier)
+  }),
+});
 
-export const collections = { people, pubs, news, outreach, talks, courses, research_focus, focus_meta, instruments, computation, science };
+export const collections = { people, pubs, news, outreach, talks, courses, research_focus, focus_meta, instruments, computation, science, photos };

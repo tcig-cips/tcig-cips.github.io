@@ -1,0 +1,159 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const all = await getCollection("photos");
+const photos = all.toSorted((a, b) =>
+  (a.data.order ?? 999) - (b.data.order ?? 999) ||
+  +(b.data.date ?? 0) - +(a.data.date ?? 0) ||
+  a.slug.localeCompare(b.slug)
+);
+
+// Pick initial selection (first item)
+const initial = photos[0];
+---
+
+<BaseLayout title="Photos">
+  <h1 class="text-3xl font-semibold mb-6">Photos</h1>
+
+  <!-- Viewer -->
+  <section class="mb-6">
+    <figure id="photo-viewer"
+            class="relative w-full aspect-[16/9] rounded-2xl overflow-hidden ring-1 ring-black/10 bg-black">
+      <img id="photo-viewer-img"
+           src={initial?.data.image}
+           alt=""
+           class="absolute inset-0 h-full w-full object-cover"
+           transition:name={`photo-${initial?.slug ?? 'initial'}`}
+      />
+      <figcaption class="absolute inset-x-0 bottom-0">
+        <div class="h-24 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+        <div class="absolute inset-x-0 bottom-0 p-4">
+          <p id="photo-viewer-caption" class="text-white drop-shadow text-base sm:text-lg">
+            {initial?.data.caption}
+          </p>
+          {initial?.data.link && (
+            <p class="mt-1">
+              <a href={initial.data.link} target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center gap-1 text-sm text-white/90 underline">
+                Open link
+                <span aria-hidden="true">↗</span>
+              </a>
+            </p>
+          )}
+        </div>
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- Grid -->
+  <section>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {photos.map((p) => (
+        <button
+          type="button"
+          class="group relative aspect-[4/3] rounded-xl overflow-hidden ring-1 ring-black/10 bg-black"
+          data-photo
+          data-slug={p.slug}
+          data-image={p.data.image}
+          data-caption={p.data.caption}
+          data-link={p.data.link ?? ''}
+          aria-label={p.data.caption}
+          title={p.data.caption}
+        >
+          <img
+            src={p.data.image}
+            alt=""
+            class="absolute inset-0 h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+            loading="lazy"
+            decoding="async"
+            transition:name={`photo-${p.slug}`}
+          />
+          <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 p-2">
+            <p class="text-white/95 text-xs line-clamp-1">{p.data.caption}</p>
+          </div>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      const viewer    = document.getElementById('photo-viewer');
+      const img       = document.getElementById('photo-viewer-img');
+      const captionEl = document.getElementById('photo-viewer-caption');
+      if (!viewer || !img || !captionEl) return;
+
+      function show(slug, src, caption, link) {
+        // Update viewer image + caption
+        // Use a named transition so tiles → viewer morph feels nice
+        img.setAttribute("src", src);
+        img.setAttribute("transition:name", "photo-" + slug);
+        captionEl.textContent = caption || "";
+
+        // Link row: update or add/remove
+        let linkP = captionEl.parentElement?.querySelector('[data-viewer-link]');
+        if (link) {
+          if (!linkP) {
+            linkP = document.createElement('p');
+            linkP.setAttribute('data-viewer-link', '1');
+            linkP.className = 'mt-1';
+            linkP.innerHTML = '<a class="inline-flex items-center gap-1 text-sm text-white/90 underline" target="_blank" rel="noopener noreferrer">Open link <span aria-hidden="true">↗</span></a>';
+            captionEl.parentElement?.appendChild(linkP);
+          }
+          const a = linkP.querySelector('a');
+          if (a) a.setAttribute('href', link);
+        } else if (linkP) {
+          linkP.remove();
+        }
+
+        // Scroll viewer into view (if needed)
+        viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      document.addEventListener('astro:page-load', () => {
+        const hash = window.location.hash.slice(1);
+        if (!hash) return;
+        const el = document.getElementById(hash);
+        if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // If you have a “big viewer” opener, call it here using data-index
+        // const i = Number(el.getAttribute('data-index'));
+        // openPhoto?.(i);
+        }
+    });
+
+      // Click → update viewer and hash
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-photo]');
+        if (!btn) return;
+        const slug    = btn.getAttribute('data-slug') || '';
+        const src     = btn.getAttribute('data-image') || '';
+        const caption = btn.getAttribute('data-caption') || '';
+        const link    = btn.getAttribute('data-link') || '';
+
+        // Update URL hash (works with back/forward)
+        history.pushState(null, '', '#'+slug);
+        show(slug, src, caption, link);
+      });
+
+      // Handle direct hash visits & browser nav
+      function hydrateFromHash() {
+        const hash = (location.hash || '').replace(/^#/, '');
+        if (!hash) return;
+        const tile = document.querySelector(`[data-photo][data-slug="${hash}"]`);
+        if (!tile) return;
+        show(
+          tile.getAttribute('data-slug') || '',
+          tile.getAttribute('data-image') || '',
+          tile.getAttribute('data-caption') || '',
+          tile.getAttribute('data-link') || ''
+        );
+      }
+      window.addEventListener('popstate', hydrateFromHash);
+      window.addEventListener('astro:page-load', hydrateFromHash);
+      hydrateFromHash();
+    })();
+  </script>
+</BaseLayout>

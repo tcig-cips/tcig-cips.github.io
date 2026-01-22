@@ -1,0 +1,155 @@
+---
+import { getCollection } from "astro:content";
+
+const {
+  limit = 12,          // how many to show on home
+  title = "Group Photos"
+} = Astro.props;
+
+// Load & sort (order asc, then date desc, then filename)
+const all = await getCollection("photos");
+const sorted = all
+  .toSorted((a, b) =>
+    (a.data.order ?? 999) - (b.data.order ?? 999) ||
+    +(b.data.date ?? 0) - +(a.data.date ?? 0) ||
+    a.slug.localeCompare(b.slug)
+  )
+  .slice(0, limit);
+---
+<style is:global>
+  /* Hide horizontal scrollbar (modern + WebKit + Firefox) */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+</style>
+
+
+<section class="mt-10" aria-labelledby="photos-heading">
+  <div class="mb-3 flex items-baseline justify-between">
+    <h2 id="photos-heading" class="text-xl font-semibold">{title}</h2>
+    <a href="/photos/" class="text-sm font-semibold underline underline-offset-4 decoration-2 hover:text-blue-700">
+      › View gallery
+    </a>
+  </div>
+
+  <div class="relative">
+   <!-- Buttons -->
+    <button
+        type="button"
+        class="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden sm:grid place-items-center h-10 w-10 rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white disabled:opacity-40 disabled:cursor-default"
+        data-carousel-prev
+        aria-label="Previous photo"
+    >
+        ‹
+    </button>
+    <button
+        type="button"
+        class="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:grid place-items-center h-10 w-10 rounded-full bg-white/90 ring-1 ring-black/10 hover:bg-white disabled:opacity-40 disabled:cursor-default"
+        data-carousel-next
+        aria-label="Next photo"
+    >
+        ›
+    </button>
+
+    <!-- Track -->
+  <div
+    class="no-scrollbar overflow-x-auto snap-x snap-mandatory pb-2 pt-1"
+    data-carousel-track
+  >
+    <div class="flex gap-4 px-1">
+      {sorted.map((p) => {
+        const card = (
+          <figure
+            class="relative w-[85vw] sm:w-[420px] aspect-[16/9] shrink-0 snap-start overflow-hidden rounded-2xl ring-1 ring-black/10 bg-black"
+          >
+            <img
+              src={p.data.image}
+              alt={p.data.caption}
+              class="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+              transition:name={`photo-${p.slug}`}            <!-- shared element -->
+            />
+            <figcaption class="absolute inset-x-0 bottom-0">
+              <div class="h-16 bg-gradient-to-t from-black/70 to-transparent"></div>
+              <div class="absolute inset-x-0 bottom-0 p-3 text-white text-sm">
+                {p.data.caption}
+              </div>
+            </figcaption>
+          </figure>
+        );
+
+        // If an external link is provided, go there.
+        // Otherwise, deep-link to Photos page anchor for the shared transition.
+        return p.data.link ? (
+          <a
+            href={p.data.link}
+            class="block"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={p.data.caption}
+          >
+            {card}
+          </a>
+        ) : (
+          <a
+            href={`/photos/#${p.slug}`}
+            class="block"
+            aria-label={p.data.caption}
+          >
+            {card}
+          </a>
+        );
+      })}
+    </div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      const track = document.querySelector('[data-carousel-track]');
+      const prev  = document.querySelector('[data-carousel-prev]');
+      const next  = document.querySelector('[data-carousel-next]');
+      if (!track) return;
+
+      // Compute a “page” width = first card width + gap (16px)
+      function page() {
+        const first = track.querySelector(':scope > div > *');
+        if (!first) return 320;
+        const r = first.getBoundingClientRect();
+        // 16px gap defined in the flex container
+        return Math.round(r.width + 16);
+      }
+
+      // Robust scroll
+      function go(dir) {
+        track.scrollBy({ left: dir * page(), behavior: 'smooth' });
+      }
+
+      // Enable/disable buttons based on scroll position
+      function updateBtns() {
+        if (!prev || !next) return;
+        const max = track.scrollWidth - track.clientWidth - 1; // tolerance
+        prev.disabled = track.scrollLeft <= 0;
+        next.disabled = track.scrollLeft >= max;
+      }
+
+      // Bind
+      prev && prev.addEventListener('click', () => go(-1));
+      next && next.addEventListener('click', () => go(1));
+      track.addEventListener('scroll', updateBtns, { passive: true });
+      window.addEventListener('resize', updateBtns);
+
+      // Initial state
+      updateBtns();
+
+      // Keyboard support when user focuses the track
+      track.tabIndex = 0;
+      track.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); go(-1); }
+      }, { passive: false });
+    })();
+  </script>
+</section>
