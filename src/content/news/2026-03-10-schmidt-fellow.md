@@ -1,0 +1,1 @@
+[Hannah Collier](/people/#hannah) has been awarded a [Schmidt AI in Science Fellowship](https://schmidtfellows.utoronto.ca/) and will join the group in Summer 2026. Hannah will work on computer vision and 3D reconstruction methods for solar observations and heliophysics.

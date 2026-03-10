@@ -3,4 +3,4 @@ date: 2026-02-20
 pinned: false
 ---
 
-Our papers [BHCast: Unlocking Black Hole Plasma Dynamics from a Single Blurry Image with Long-Term Forecasting](/publications/bhcast) and [Dynamic Black-hole Emission Tomography with Physics-informed Neural Fields](/publications/pidef) have been accepted to CVPR 2026. Congratulations to [Renbo Tu](/people/#renbo) and [David Bromley](/people/#david)!
+Two papers [BHCast: Unlocking Black Hole Plasma Dynamics from a Single Blurry Image with Long-Term Forecasting](/publications/bhcast) and [Dynamic Black-hole Emission Tomography with Physics-informed Neural Fields](/publications/pidef) have been accepted to CVPR 2026. Congratulations to [Renbo Tu](/people/#renbo) and [David Bromley](/people/#david)!
