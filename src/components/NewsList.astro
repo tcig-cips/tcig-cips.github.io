@@ -75,10 +75,14 @@ const fmt = (d: Date | string) =>
   )}
 
   <div class="overflow-x-auto rounded-xl border">
-    <table class="min-w-full text-sm">
+    <table class="min-w-full text-sm table-fixed">
+      <colgroup>
+        <col class="w-36" />
+        <col />
+      </colgroup>
       <thead class="bg-gray-50 text-gray-600">
         <tr>
-          <th class="px-3 py-2 text-left w-36">Date</th>
+          <th class="px-3 py-2 text-left">Date</th>
           <th class="px-3 py-2 text-left">News</th>
         </tr>
       </thead>
@@ -92,7 +96,7 @@ const fmt = (d: Date | string) =>
                 {fmt(entry.data.date)}
               </time>
             </td>
-            <td class="px-3 py-2 align-top">
+            <td class="px-3 py-2 align-top break-words">
               <div class="prose prose-sm max-w-none">
                 <Content />
               </div>
@@ -103,34 +107,40 @@ const fmt = (d: Date | string) =>
 
       <!-- Rest (hidden until toggled) -->
       {rest.length > 0 && (
-      <tr>
-        <td colspan="2" class="p-0">
-          <div
-            id={`${uid}-rest`}
-            class="overflow-hidden max-h-0 opacity-0 transition-[max-height,opacity] duration-300 ease-out"
-            data-news-panel
-          >
-            <table class="min-w-full text-sm">
-              <tbody class="divide-y">
-                {rest.map(({ entry, Content }) => (
-                  <tr id={entry.slug}>
-                    <td class="whitespace-nowrap px-3 py-2 text-gray-600 align-top">
-                      <time datetime={new Date(entry.data.date).toISOString()} class="tabular-nums">
-                        {fmt(entry.data.date)}
-                      </time>
-                    </td>
-                    <td class="px-3 py-2 align-top">
-                      <div class="prose prose-sm max-w-none">
-                        <Content />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </td>
-      </tr>
+      <tbody>
+        <tr>
+          <td colspan="2" class="p-0 border-0">
+            <div
+              id={`${uid}-rest`}
+              class="overflow-hidden max-h-0 opacity-0 transition-[max-height,opacity] duration-300 ease-out"
+              data-news-panel
+            >
+              <table class="min-w-full text-sm table-fixed">
+                <colgroup>
+                  <col class="w-36" />
+                  <col />
+                </colgroup>
+                <tbody class="divide-y divide-gray-200">
+                  {rest.map(({ entry, Content }) => (
+                    <tr id={entry.slug}>
+                      <td class="whitespace-nowrap px-3 py-2 text-gray-600 align-top border-t">
+                        <time datetime={new Date(entry.data.date).toISOString()} class="tabular-nums">
+                          {fmt(entry.data.date)}
+                        </time>
+                      </td>
+                      <td class="px-3 py-2 align-top border-t break-words">
+                        <div class="prose prose-sm max-w-none">
+                          <Content />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </tbody>
     )}
     </table>
   </div>
