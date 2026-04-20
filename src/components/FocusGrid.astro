@@ -30,17 +30,80 @@ if (!items.length) return;
   <!-- grid: we'll place tiles on grid-row:1 and galleries on grid-row:2 (full-width) -->
   <div class="fg-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items:start;">
     <style>
-      /* local styles: reveal the gallery sibling when its preceding .group is hovered/focused */
-      .fg-grid .group { grid-row: 1; }
-      .fg-grid .fg-gallery { grid-row: 2; grid-column: 1 / -1; max-height: 0; opacity: 0; overflow: hidden;
-                             transition: max-height 300ms ease, opacity 200ms ease; pointer-events: none; background: white/95; }
-      .fg-grid .group:hover + .fg-gallery,
-      .fg-grid .group:focus-within + .fg-gallery,
-      .fg-grid .fg-gallery:hover,
-      .fg-grid .group.fg-open + .fg-gallery,
-      .fg-grid .fg-gallery.fg-open { max-height: var(--fg-row-h); opacity: 1; pointer-events: auto; }
-       .fg-grid .fg-gallery-inner { height: var(--fg-row-h); display: flex; align-items: center; justify-content: flex-start; gap: 0.75rem; flex-wrap: nowrap; overflow-x: auto; padding: 0.5rem; }
-       .fg-grid .fg-gallery-inner img { height: calc(var(--fg-row-h) - 1rem); flex-shrink: 0; width: auto; object-fit: cover; border-radius: 0.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.06); }
+      /* Mobile-first: keep cards and previews stacked because hover galleries do not work on touch. */
+      .fg-grid .fg-gallery {
+        grid-column: auto;
+        max-height: none;
+        opacity: 1;
+        overflow: visible;
+        pointer-events: auto;
+      }
+
+      .fg-grid .fg-gallery-inner {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        padding: 0.25rem 0 0;
+      }
+
+      .fg-grid .fg-gallery-inner a {
+        min-width: 0;
+      }
+
+      .fg-grid .fg-gallery-inner img {
+        aspect-ratio: 4 / 3;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        border: 1px solid rgba(0,0,0,0.06);
+      }
+
+      @media (min-width: 640px) {
+        /* Desktop/tablet: reveal the gallery sibling when its preceding .group is hovered/focused. */
+        .fg-grid .group {
+          grid-row: 1;
+        }
+
+        .fg-grid .fg-gallery {
+          grid-row: 2;
+          grid-column: 1 / -1;
+          max-height: 0;
+          opacity: 0;
+          overflow: hidden;
+          transition: max-height 300ms ease, opacity 200ms ease;
+          pointer-events: none;
+          background: rgb(255 255 255 / 0.95);
+        }
+
+        .fg-grid .group:hover + .fg-gallery,
+        .fg-grid .group:focus-within + .fg-gallery,
+        .fg-grid .fg-gallery:hover,
+        .fg-grid .group.fg-open + .fg-gallery,
+        .fg-grid .fg-gallery.fg-open {
+          max-height: var(--fg-row-h);
+          opacity: 1;
+          pointer-events: auto;
+        }
+
+        .fg-grid .fg-gallery-inner {
+          height: var(--fg-row-h);
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 0.75rem;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          padding: 0.5rem;
+        }
+
+        .fg-grid .fg-gallery-inner img {
+          height: calc(var(--fg-row-h) - 1rem);
+          width: auto;
+          aspect-ratio: auto;
+          flex-shrink: 0;
+        }
+      }
     </style>
 
     {items.map((it, i) => {

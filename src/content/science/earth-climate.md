@@ -1,8 +1,7 @@
 ---
 title: Earth & Climate Science
 image: /images/focus/clouds.gif
-description: Multi-angle, multi-spectral polarimetric sensing to infer 3D structure, microphysics, and environmental processes across Earth’s atmosphere and oceans. We develop radiative-transfer–driven reconstruction methods for inverse problems, enabling improved climate understanding and environmental monitoring.
+description: Earth system science through advanced computational imaging, remote sensing, and machine learning. We study the atmosphere, oceans, weather, and climate using satellite observations, physics-based inference, and data-driven methods to improve environmental understanding, monitoring, and prediction.
 order: 4
 ---
-
-Multi-angle, multi-spectral polarimetric sensing to infer 3D structure, microphysics, and environmental processes across Earth’s atmosphere and oceans. We develop radiative-transfer–driven reconstruction methods for inverse problems, enabling improved climate understanding and environmental monitoring.
+Earth system science through advanced computational imaging, remote sensing, and machine learning. We study the atmosphere, oceans, weather, and climate using satellite observations, physics-based inference, and data-driven methods to improve environmental understanding, monitoring, and prediction.
