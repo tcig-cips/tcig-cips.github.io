@@ -30,33 +30,9 @@ if (!items.length) return;
   <!-- grid: we'll place tiles on grid-row:1 and galleries on grid-row:2 (full-width) -->
   <div class="fg-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" style="align-items:start;">
     <style>
-      /* Mobile-first: keep cards and previews stacked because hover galleries do not work on touch. */
+      /* Mobile-first: show only the topic cards because hover galleries do not work on touch. */
       .fg-grid .fg-gallery {
-        grid-column: auto;
-        max-height: none;
-        opacity: 1;
-        overflow: visible;
-        pointer-events: auto;
-      }
-
-      .fg-grid .fg-gallery-inner {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.75rem;
-        padding: 0.25rem 0 0;
-      }
-
-      .fg-grid .fg-gallery-inner a {
-        min-width: 0;
-      }
-
-      .fg-grid .fg-gallery-inner img {
-        aspect-ratio: 4 / 3;
-        width: 100%;
-        object-fit: cover;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-        border: 1px solid rgba(0,0,0,0.06);
+        display: none;
       }
 
       @media (min-width: 640px) {
@@ -66,6 +42,7 @@ if (!items.length) return;
         }
 
         .fg-grid .fg-gallery {
+          display: block;
           grid-row: 2;
           grid-column: 1 / -1;
           max-height: 0;
