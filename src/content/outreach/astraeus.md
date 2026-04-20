@@ -15,10 +15,3 @@ links:
   - label: GitHub code
     href: https://github.com/thanosan23/astraeus
 ---
-
-Led by high-school researchers [Thanosan Prathifkumar](https://tcig-cips.github.io/people/#thanosan) (Central Peel Secondary School)
-and Krish Desai (Turner Fenton Secondary School), in collaboration with Aviad Levis,
-[Astraeus](https://thanosan23.github.io/astraeus/) is an interactive GUI for understanding
-radio interferometry. The tool models arrays such as ALMA, the VLA, and the Event Horizon Telescope, enabling real time exploration of how antenna geometries and baselines sculpt the synthetic aperture and resulting reconstructed images.
-
-By visualizing correlated visibilities for Earth-based and spaceborne telescope concepts, Astraeus introduces researchers, educators, and students into the world of radio interferometry.

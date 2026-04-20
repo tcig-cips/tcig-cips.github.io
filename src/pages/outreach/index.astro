@@ -17,64 +17,119 @@ const entries = await Promise.all(
     };
   }),
 );
+
+const seminarEntries = entries.filter(({ entry }) => entry.data.section === "seminar");
+const outreachEntries = entries.filter(({ entry }) => entry.data.section !== "seminar");
 ---
-<BaseLayout title="Outreach">
+<BaseLayout title="Community & Outreach">
   <div class="mb-8 space-y-3">
     <p class="text-xs uppercase tracking-[0.3em] text-gray-500">Community & Education</p>
-    <h1 class="text-3xl font-semibold">Outreach</h1>
+    <h1 class="text-3xl font-semibold">Community & Outreach</h1>
+  </div>
+
+  <div class="space-y-5">
     <div class="space-y-2">
-      <p class="text-sm uppercase tracking-[0.4em] text-indigo-600 font-semibold">Mission</p>
-      <p class="text-sm sm:text-base text-gray-700 leading-relaxed">
+      <p class="text-sm uppercase tracking-[0.4em] text-indigo-600 font-semibold">Research Community</p>
+      <h2 class="text-2xl font-semibold">Seminars & Community</h2>
+      <p class="max-w-3xl text-sm sm:text-base text-gray-700 leading-relaxed">
+        We help build interdisciplinary research communities through seminar series that connect computer vision, computational imaging, physics-informed machine learning, and the physical sciences.
+      </p>
+    </div>
+
+    <div class="grid gap-5 md:grid-cols-2">
+      {seminarEntries.map(({ entry, Content }) => (
+        <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm" id={entry.slug}>
+          <figure class="overflow-hidden border-b border-black/5">
+            <img
+              src={entry.data.image}
+              alt={entry.data.imageAlt ?? ""}
+              class="h-32 w-full object-cover sm:h-36"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+
+          <div class="flex flex-1 flex-col gap-1.5 p-5">
+            {entry.data.category && (
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">{entry.data.category}</p>
+            )}
+            <h3 class="text-xl font-semibold">{entry.data.title}</h3>
+            <p class="text-sm text-gray-700 leading-relaxed">{entry.data.description}</p>
+            <div class="text-sm text-gray-600 leading-relaxed [&>p]:m-0">
+              <Content />
+            </div>
+
+            <div class="pt-0">
+              {entry.data.links?.map((link) => (
+                <a
+                  class="inline-flex items-center gap-1 text-sm font-semibold text-blue-700 underline hover:text-blue-900"
+                  href={link.href}
+                  target={link.href.startsWith('http') ? "_blank" : undefined}
+                  rel={link.href.startsWith('http') ? "noopener noreferrer" : undefined}
+                >
+                  {link.label}{link.href.startsWith('http') ? ' ↗' : ''}
+                </a>
+              ))}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+
+  <div class="mt-14 space-y-5">
+    <div class="space-y-2">
+      <p class="text-sm uppercase tracking-[0.4em] text-indigo-600 font-semibold">Outreach</p>
+      <h2 class="text-2xl font-semibold">Community & Outreach</h2>
+      <p class="max-w-3xl text-sm sm:text-base text-gray-700 leading-relaxed">
         Our outreach is driven by a simple goal: to bring the excitement of STEM to the foreground by sharing the wonder of discovery.
-        Through the lens of astronomy—where anyone can look up at the night sky and feel connected—we introduce young researchers
-        and broader audiences to the magic of physics-informed imaging. From black holes that captivated the world to the algorithms
-        behind modern telescopes, we use awe-inspiring science to show how ideas, computation, and curiosity come together to reveal the unseen.
+        Through the lens of astronomy, we introduce students and broader audiences to the magic of physics-informed imaging and the science behind seeing the unseen.
       </p>
       <p class="text-sm text-gray-600">
         Interested in partnering or inviting us to speak? <a class="font-semibold text-blue-700 hover:text-blue-900 underline" href="mailto:alevis@cs.toronto.edu">Contact us</a>.
       </p>
     </div>
-  </div>
 
-  <div class="space-y-8">
-    {entries.map(({ entry, Content }) => (
-      <article class="rounded-2xl border border-black/10 bg-white shadow-sm p-6 space-y-4" id={entry.slug}>
-        <header class="space-y-1">
-          {entry.data.category && (
-            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">{entry.data.category}</p>
-          )}
-          <h2 class="text-2xl font-semibold">{entry.data.title}</h2>
-          {entry.data.description && (
-            <p class="text-sm text-gray-600">{entry.data.description}</p>
-          )}
-        </header>
-        <div class={`flex flex-col gap-4 ${entry.data.image ? 'md:flex-row md:items-start' : ''}`}>
-          {entry.data.image && (
-            <figure class="rounded-xl overflow-hidden border border-black/5 shadow max-w-xs shrink-0">
-              <img src={entry.data.image} alt={entry.data.imageAlt ?? ''} class={`w-full ${entry.data.imageHeightClass ?? 'max-h-40'} object-cover`} loading="lazy" decoding="async" />
-              {entry.data.imageAlt && (
-                <figcaption class="px-3 py-1.5 text-xs text-gray-500 bg-white/80">
-                  {entry.data.imageAlt}
-                </figcaption>
-              )}
-            </figure>
-          )}
-          <div class="space-y-3 text-gray-700 leading-relaxed">
-            <Content />
-            {entry.data.links?.length ? (
-              <ul class="flex flex-wrap gap-3 text-sm text-blue-700 font-semibold">
-                {entry.data.links.map((link) => (
-                  <li>
-                    <a class="inline-flex items-center gap-1 underline" href={link.href} target={link.href.startsWith('http') ? "_blank" : undefined} rel={link.href.startsWith('http') ? "noopener noreferrer" : undefined}>
-                      {link.label}{link.href.startsWith('http') ? ' ↗' : ''}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+    <div class="grid gap-5 md:grid-cols-2">
+      {outreachEntries.map(({ entry, Content }) => (
+        <article class="rounded-2xl border border-black/10 bg-white shadow-sm p-6 space-y-4" id={entry.slug}>
+          <header class="space-y-1">
+            {entry.data.category && (
+              <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">{entry.data.category}</p>
+            )}
+            <h2 class="text-2xl font-semibold">{entry.data.title}</h2>
+            {entry.data.description && (
+              <p class="text-sm text-gray-600">{entry.data.description}</p>
+            )}
+          </header>
+          <div class={`flex flex-col gap-4 ${entry.data.image ? 'md:flex-row md:items-start' : ''}`}>
+            {entry.data.image && (
+              <figure class="rounded-xl overflow-hidden border border-black/5 shadow max-w-xs shrink-0">
+                <img src={entry.data.image} alt={entry.data.imageAlt ?? ''} class={`w-full ${entry.data.imageHeightClass ?? 'max-h-40'} object-cover`} loading="lazy" decoding="async" />
+                {entry.data.imageAlt && (
+                  <figcaption class="px-3 py-1.5 text-xs text-gray-500 bg-white/80">
+                    {entry.data.imageAlt}
+                  </figcaption>
+                )}
+              </figure>
+            )}
+            <div class="space-y-3 text-gray-700 leading-relaxed">
+              <Content />
+              {entry.data.links?.length ? (
+                <ul class="flex flex-wrap gap-3 text-sm text-blue-700 font-semibold">
+                  {entry.data.links.map((link) => (
+                    <li>
+                      <a class="inline-flex items-center gap-1 underline" href={link.href} target={link.href.startsWith('http') ? "_blank" : undefined} rel={link.href.startsWith('http') ? "noopener noreferrer" : undefined}>
+                        {link.label}{link.href.startsWith('http') ? ' ↗' : ''}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
           </div>
-        </div>
-      </article>
-    ))}
+        </article>
+      ))}
+    </div>
   </div>
 </BaseLayout>

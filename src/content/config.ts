@@ -132,6 +132,7 @@ const outreach = defineCollection({
   schema: z.object({
     title: z.string(),
     category: z.string().optional(),
+    section: z.enum(['seminar', 'outreach']).optional(),
     date: z.coerce.date().optional(),
     description: z.string(),
     image: z.string().optional(),
