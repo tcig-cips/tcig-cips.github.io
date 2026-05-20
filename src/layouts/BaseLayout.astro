@@ -378,6 +378,80 @@ const { title = 'PI-Vision', noTopPad = false } = Astro.props;
       document.addEventListener('astro:page-load', scheduleFocusGrid);
       document.addEventListener('astro:after-swap', scheduleFocusGrid);
 
+      const bindPublicationSearch = () => {
+        const pubSearch = document.getElementById('pub-search');
+        if (!pubSearch || pubSearch.dataset.pubSearchBound === 'true') return;
+
+        pubSearch.dataset.pubSearchBound = 'true';
+        const pubCards = Array.from(document.querySelectorAll('[data-pub-card]'));
+        const pubRows = Array.from(document.querySelectorAll('[data-pub-row]'));
+        const pubSearchEmpty = document.getElementById('pub-search-empty');
+        const olderPubs = document.querySelector('[data-older-pubs]');
+        const mainPubGrid = document.querySelector('[data-pub-main-grid]');
+        const olderPubGrid = document.querySelector('[data-pub-older-grid]');
+        const hasRows = pubRows.length > 0;
+
+        const updatePubSearch = () => {
+          const query = pubSearch.value.trim().toLowerCase();
+          let visibleCards = 0;
+          let visibleRows = 0;
+
+          if (mainPubGrid && olderPubGrid) {
+            const olderCards = Array.from(olderPubGrid.querySelectorAll(':scope > [data-pub-card]'));
+            const movedCards = Array.from(mainPubGrid.querySelectorAll(':scope > [data-pub-card][data-pub-moved="true"]'));
+
+            if (query) {
+              olderCards.forEach((card) => {
+                card.dataset.pubMoved = 'true';
+                mainPubGrid.appendChild(card);
+              });
+            } else {
+              movedCards.forEach((card) => {
+                delete card.dataset.pubMoved;
+                olderPubGrid.appendChild(card);
+              });
+            }
+          }
+
+          pubCards.forEach((card) => {
+            const searchText = card.getAttribute('data-search') ?? '';
+            const matches = query
+              ? searchText.includes(query)
+              : hasRows || card.getAttribute('data-recent') === 'true';
+
+            card.classList.toggle('hidden', !matches);
+            if (matches) visibleCards += 1;
+          });
+
+          pubRows.forEach((row) => {
+            const searchText = row.getAttribute('data-search') ?? '';
+            const matches = query ? searchText.includes(query) : true;
+            row.classList.toggle('hidden', !matches);
+            if (matches) visibleRows += 1;
+          });
+
+          if (olderPubs) {
+            if (query) {
+              olderPubs.classList.add('hidden');
+            } else {
+              olderPubs.removeAttribute('open');
+              olderPubs.classList.remove('hidden');
+            }
+          }
+
+          const visible = hasRows ? visibleRows : visibleCards;
+          pubSearchEmpty?.classList.toggle('hidden', visible > 0 || !query);
+        };
+
+        pubSearch.addEventListener('input', updatePubSearch);
+        updatePubSearch();
+      };
+
+      const schedulePublicationSearch = () => window.requestAnimationFrame(bindPublicationSearch);
+      schedulePublicationSearch();
+      document.addEventListener('astro:page-load', schedulePublicationSearch);
+      document.addEventListener('astro:after-swap', schedulePublicationSearch);
+
       let pendingHash = '';
 
       document.addEventListener('astro:before-swap', (event) => {
