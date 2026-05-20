@@ -19,36 +19,58 @@ const byDateDesc = (a, b) =>
 const sorted = all.sort(byDateDesc);
 const featuredTiles = sorted.slice(0, TILE_COUNT);  // only N tiles (most recent)
 const olderTiles = sorted.slice(TILE_COUNT);
+
+const pubSearchText = (p) => [
+  p.data.title,
+  ...(p.data.authors ?? []),
+  p.data.venue,
+].filter(Boolean).join(' ').toLowerCase();
 ---
 <BaseLayout title="Publications">
-  <h1 class="text-3xl font-semibold mb-6">Publications</h1>
+  <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <h1 class="text-3xl font-semibold">Publications</h1>
+      <label class="flex flex-col gap-1 md:w-96">
+        <span class="text-sm font-semibold text-gray-900">Search all publications</span>
+        <input
+          id="pub-search"
+          type="search"
+          placeholder="Search titles, authors, or venues"
+          class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          autocomplete="off"
+        />
+      </label>
+  </div>
 
   {featuredTiles.length > 0 && (
     <>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6" data-pub-main-grid>
         {featuredTiles.map(p => (
-          <PubTile
-            entry={p}
-            to={`/publications/${p.slug}/`}       // publications tile → paper subpage (title morph handled by table link)
-            suppressTitleTransition={true}        // prevent duplicate title names on this page
-          />
+          <div data-pub-card data-search={pubSearchText(p)}>
+            <PubTile
+              entry={p}
+              to={`/publications/${p.slug}/`}       // publications tile → paper subpage (title morph handled by table link)
+              suppressTitleTransition={true}        // prevent duplicate title names on this page
+            />
+          </div>
         ))}
       </div>
 
       {olderTiles.length > 0 && (
-        <details class="mb-10 bg-gray-50/60 rounded-xl border border-gray-200">
+        <details class="mb-10 bg-gray-50/60 rounded-xl border border-gray-200" data-older-pubs>
           <summary class="cursor-pointer px-4 py-3 flex items-center justify-between gap-4 text-sm font-semibold">
             <span>Show older publications ({olderTiles.length} more)</span>
             <span aria-hidden="true" class="text-base">›</span>
           </summary>
           <div class="px-4 pb-4 pt-1">
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" data-pub-older-grid>
               {olderTiles.map(p => (
-                <PubTile
-                  entry={p}
-                  to={`/publications/${p.slug}/`}
-                  suppressTitleTransition={true}
-                />
+                <div data-pub-card data-search={pubSearchText(p)}>
+                  <PubTile
+                    entry={p}
+                    to={`/publications/${p.slug}/`}
+                    suppressTitleTransition={true}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -56,6 +78,7 @@ const olderTiles = sorted.slice(TILE_COUNT);
       )}
     </>
   )}
+  <p id="pub-search-empty" class="hidden mb-6 text-sm text-gray-600">No publications matched your search.</p>
 
 
   <!-- Full table (ALL papers, not just the tile ones) -->
@@ -73,7 +96,7 @@ const olderTiles = sorted.slice(TILE_COUNT);
         {sorted.map(p => {
           const firstEtAl = firstAuthorsEtAl(p.data.authors ?? [], p.data.first_authors);
           return (
-            <tr id={p.slug}>
+            <tr id={p.slug} data-pub-row data-search={pubSearchText(p)}>
               <td class="px-3 py-2 text-gray-600">{p.data.month ?? ''} {p.data.year}</td>
               <td class="px-3 py-2">
                 <a href={`/publications/${p.slug}/`} class="font-medium hover:underline">
