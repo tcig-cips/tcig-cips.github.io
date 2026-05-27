@@ -30,7 +30,8 @@ const byDateDesc = (a, b) =>
   (b.data.year - a.data.year) ||
   (monthToNum(b.data.month) - monthToNum(a.data.month));
 
-const recentTiles = pubs.sort(byDateDesc).slice(0, TILE_COUNT);
+const sortedPubs = pubs.sort(byDateDesc);
+const recentTiles = sortedPubs.slice(0, TILE_COUNT);
 // import { getCollection } from 'astro:content';
 import FocusGrid from "../components/FocusGrid.astro";
 
@@ -151,26 +152,53 @@ const focusItems = await Promise.all(focusMeta.map(async (entry) => {
 	<FocusGrid items={focusItems} heading="Research Focus" ratio="aspect-[20/9]" />
 
      <!-- Recent Publications (grid) -->
-	<div class="mb-3 flex items-baseline gap-4">
-		<h2 class="text-xl font-semibold">Recent Publications</h2>
-		<a
-			href="/publications/"
-			class="inline-flex items-center gap-2 font-semibold text-600 hover:text-blue-700"
-		>
-			<span aria-hidden="true" class="select-none">›</span>
-			<span class="underline underline-offset-4 decoration-2">View all publications</span>
-		</a>
+	<div class="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+		<div class="flex items-baseline gap-4">
+			<h2 class="text-xl font-semibold">Recent Publications</h2>
+			<a
+				href="/publications/"
+				class="inline-flex items-center gap-2 font-semibold text-600 hover:text-blue-700"
+			>
+				<span aria-hidden="true" class="select-none">›</span>
+				<span class="underline underline-offset-4 decoration-2">View all publications</span>
+			</a>
+		</div>
+		<div class="flex flex-col gap-1 md:w-96">
+			<label for="pub-search" class="text-sm font-semibold text-gray-900">Search all publications</label>
+			<input
+				id="pub-search"
+				type="search"
+				placeholder="Search titles, authors, or venues"
+				class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+				autocomplete="off"
+			/>
+		</div>
 	</div>
 
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {recentTiles.map(p => (
-		<PubTile
-			entry={p}
-			to={`/publications/${p.slug}/`}          // link directly to the publication page
-			suppressTitleTransition={false}           // ok here; no duplicates on the home page
-		/>
-		))}
+    <div id="pub-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {sortedPubs.map((p, index) => {
+		const searchText = [
+			p.data.title,
+			...(p.data.authors ?? []),
+			p.data.venue,
+		].filter(Boolean).join(' ').toLowerCase();
+		return (
+			<div
+				class={index < TILE_COUNT ? '' : 'hidden'}
+				data-pub-card
+				data-recent={index < TILE_COUNT ? 'true' : 'false'}
+				data-search={searchText}
+			>
+				<PubTile
+					entry={p}
+					to={`/publications/${p.slug}/`}          // link directly to the publication page
+					suppressTitleTransition={false}           // ok here; no duplicates on the home page
+				/>
+			</div>
+		);
+		})}
     </div>
+	<p id="pub-search-empty" class="hidden mt-3 text-sm text-gray-600">No publications matched your search.</p>
 
 	<NewsList limit={6} />
 
