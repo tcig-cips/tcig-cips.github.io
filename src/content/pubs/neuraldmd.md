@@ -1,10 +1,10 @@
 ---
-title: "Neural Dynamic Modes: Computational Imaging of Dynamical Systems from Sparse Observations"
-authors: ["Ali SaraerToosi", "Renbo Tu", "Kamyar Azizzadenesheli", "Aviad Levis"]
+title: "NeuralDMD: Interpretable Neural Representation of Dynamics from Sparse and Noisy Measurements"
+authors: ["Ali SaraerToosi", "Renbo Tu", "Esther Y.H. Lin", "Kamyar Azizzadenesheli", "Aviad Levis"]
 first_authors: ["Ali SaraerToosi", "Renbo Tu"]
-venue: arXiv
-year: 2025
-month: Jul
+venue: ECCV
+year: 2026
+month: Sep
 focusTags:
   - eht
   - data-driven-dynamics
@@ -12,20 +12,17 @@ focusTags:
   - differentiable-physics
   - black-holes-strong-gravity
   - earth-climate
-thumbnail: /images/pubs/neuraldmd.png   # or teaser: for the larger detail image/gif
+thumbnail: /images/pubs/neuraldmd-eccv.png
 project: https://neuraldmd.vercel.app/
-pdf: https://arxiv.org/abs/2507.03094/
+arxiv: https://arxiv.org/abs/2507.03094
 code: https://github.com/as2c/NeuralDMD
 abstract: >
-  Dynamical systems are ubiquitous within science and engineering, from turbulent flow across aircraft wings to structural variability of proteins. Although some systems are well understood and simulated, scientific imaging often confronts never-before-seen dynamics observed through indirect, noisy, and highly sparse measurements. We present NeuralDMD, a model-free framework that combines neural implicit representations with Dynamic Mode Decomposition (DMD) to reconstruct continuous spatio-temporal dynamics from such measurements. The expressiveness of neural representations lets the method capture complex spatial structures, while the linear dynamical modes of DMD introduce an inductive bias that guides training and supports stable, low-dimensional forecasting. We validate NeuralDMD on two challenging problems: recovering the evolution of plasma near the Galactic-center black hole, Sgr A*, and reconstructing near-surface wind-speed fields over North America from sparse station observations. In both cases NeuralDMD outperforms established baselines, demonstrating its potential as a general tool for imaging dynamical systems across astronomy, geoscience, and beyond.
+  Many challenges in scientific imaging involve solving ill-posed inverse problems, where the goal is to recover spatio-temporal fields from indirect, noisy, and highly sparse measurements - often without access to ground truth data or reliable simulators. To address this challenging scenario, we present NeuralDMD, an interpretable, untrained (per-instance) reconstruction framework that combines neural implicit representations with Dynamic Mode Decomposition (DMD) to reconstruct continuous spatio-temporal dynamics directly from measurements. NeuralDMD parameterizes DMD modes as continuous neural fields, and imposes a low-rank linear dynamics prior with spectral time evolution to enforce temporal continuity. This formulation enables both forecasting under sparsity, and yields interpretable modes and spectra. We find that NeuralDMD outperforms baselines on a wide variety of tasks: from weather data assimilation from sparse station observations to interferometric (Fourier domain) observations of Sagittarius A, the black hole at the center of our galaxy. Moreover, NeuralDMD remains stable when extrapolating into the future. While this framework is most naturally suited to linear dynamics, we show that it can be applied to nonlinear regimes, though with extrapolation performance that degrades with increasing nonlinearity. Together, these results show that NeuralDMD enables interpretable reconstruction and forecasting of spatio-temporal dynamics directly from sparse and indirect measurements without relying on numerical simulators or training data.
 bibtex: |
-  @misc{saraertoosi2025neuraldynamicmodescomputational,
-    title        = {Neural Dynamic Modes: Computational Imaging of Dynamical Systems from Sparse Observations},
-    author       = {Ali SaraerToosi and Renbo Tu and Kamyar Azizzadenesheli and Aviad Levis},
-    year         = {2025},
-    eprint       = {2507.03094},
-    archivePrefix= {arXiv},
-    primaryClass = {cs.LG},
-    url          = {https://arxiv.org/abs/2507.03094}
+  @inproceedings{saraertoosi2026neuraldmd,
+    title={NeuralDMD: Interpretable Neural Representation of Dynamics from Sparse and Noisy Measurements},
+    author={SaraerToosi, Ali and Tu, Renbo and Lin, Esther Y.H. and Azizzadenesheli, Kamyar and Levis, Aviad},
+    booktitle={European Conference on Computer Vision},
+    year={2026}
   }
 ---

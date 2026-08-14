@@ -33,6 +33,7 @@ const pubs = defineCollection({
     youtube: z.string().optional(),
     video: z.string().url().optional(),
     project: z.string().url().optional(),
+    arxiv: z.string().url().optional(),
     pdf: z.string().url().optional(),
     code: z.string().url().optional(),
     scholar: z.string().url().optional(),

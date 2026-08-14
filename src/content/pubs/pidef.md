@@ -4,6 +4,7 @@ authors: ["Berthy T. Feng", "Andrew A. Chael", "David Bromley", "Aviad Levis", "
 first_authors: ["Berthy T. Feng"]
 venue: CVPR
 year: 2026
+month: Jun
 focusTags:
   - eht
   - differentiable-physics
