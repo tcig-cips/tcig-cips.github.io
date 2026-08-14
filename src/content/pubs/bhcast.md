@@ -4,6 +4,7 @@ authors: ["Renbo Tu", "Ali SaraerToosi", "Nicholas S. Conroy", "Gennady Pekhimen
 first_authors: ["Renbo Tu"]
 venue: CVPR
 year: 2026
+month: Jun
 focusTags:
   - eht
   - differentiable-physics

@@ -24,7 +24,7 @@ const avatar = (p) => p.data.image ?? "/images/placeholder-avatar.svg";
 
 const monthToNum = (m) =>
   typeof m === "number" ? m :
-  typeof m === "string" ? new Date(`${m} 1, 2000`).getMonth() + 1 : 12;
+  typeof m === "string" ? new Date(`${m} 1, 2000`).getMonth() + 1 : 0;
 
 const byDateDesc = (a, b) =>
   (b.data.year - a.data.year) ||

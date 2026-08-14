@@ -28,7 +28,12 @@ const rest = await renderBatch(restRaw);
 const uid = 'news_' + Math.random().toString(36).slice(2, 8);
 
 const fmt = (d: Date | string) =>
-  new Date(d).toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' });
+  new Date(d).toLocaleDateString('en-CA', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
 ---
 <section class="mt-10" aria-labelledby={`${uid}-heading`}>
   <div class="mb-3 flex items-baseline gap-4">
