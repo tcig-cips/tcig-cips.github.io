@@ -76,8 +76,8 @@ const Body = Rendered.Content;
       {abstract ? <p>{abstract}</p> : <Body />}
       {/* links */}
       <div class="not-prose mt-4 flex flex-wrap gap-2">
-        {entry.data.project && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.project}>webpage</a>}
-        {entry.data.press && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.press}>media</a>}
+        {entry.data.project && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.project}>{entry.data.projectLabel ?? "webpage"}</a>}
+        {entry.data.press && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.press}>{entry.data.pressLabel ?? "media"}</a>}
         {entry.data.arxiv   && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.arxiv}>arxiv</a>}
         {entry.data.pdf     && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.pdf}>pdf</a>}
         {entry.data.supplement && <a class="inline-flex items-center rounded border px-3 py-1 hover:bg-gray-50" href={entry.data.supplement}>supplement</a>}

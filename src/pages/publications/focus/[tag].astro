@@ -35,6 +35,7 @@ const monthToNum = (m: number | string | undefined) =>
   typeof m === "number" ? m :
   typeof m === "string" ? new Date(`${m} 1, 2000`).getMonth() + 1 : 0;
 const byDateDesc = (a, b) =>
+  (Number(b.data.featured) - Number(a.data.featured)) ||
   (b.data.year - a.data.year) ||
   (monthToNum(b.data.month) - monthToNum(a.data.month));
 
