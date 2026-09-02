@@ -25,6 +25,7 @@ const pubs = defineCollection({
     venue: z.string().optional(),
     year: z.number(),
     month: z.union([z.string(), z.number()]).optional(),
+    sortOrder: z.number().default(0),
     focusTags: z.array(z.string()).optional(),
 
     // media/links

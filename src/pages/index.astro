@@ -29,7 +29,8 @@ const monthToNum = (m) =>
 const byDateDesc = (a, b) =>
   (Number(b.data.featured) - Number(a.data.featured)) ||
   (b.data.year - a.data.year) ||
-  (monthToNum(b.data.month) - monthToNum(a.data.month));
+  (monthToNum(b.data.month) - monthToNum(a.data.month)) ||
+  ((b.data.sortOrder ?? 0) - (a.data.sortOrder ?? 0));
 
 const sortedPubs = pubs.sort(byDateDesc);
 const recentTiles = sortedPubs.slice(0, TILE_COUNT);

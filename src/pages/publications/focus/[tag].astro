@@ -37,7 +37,8 @@ const monthToNum = (m: number | string | undefined) =>
 const byDateDesc = (a, b) =>
   (Number(b.data.featured) - Number(a.data.featured)) ||
   (b.data.year - a.data.year) ||
-  (monthToNum(b.data.month) - monthToNum(a.data.month));
+  (monthToNum(b.data.month) - monthToNum(a.data.month)) ||
+  ((b.data.sortOrder ?? 0) - (a.data.sortOrder ?? 0));
 
 const filtered = allPubs
   .filter((pub) => pub.data.focusTags?.includes(tag))

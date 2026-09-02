@@ -15,7 +15,8 @@ const monthToNum = (m) =>
 const byDateDesc = (a, b) =>
   (Number(b.data.featured) - Number(a.data.featured)) ||
   (b.data.year - a.data.year) ||
-  (monthToNum(b.data.month) - monthToNum(a.data.month));
+  (monthToNum(b.data.month) - monthToNum(a.data.month)) ||
+  ((b.data.sortOrder ?? 0) - (a.data.sortOrder ?? 0));
 
 const sorted = all.sort(byDateDesc);
 const featuredTiles = sorted.slice(0, TILE_COUNT);  // only N tiles (most recent)
